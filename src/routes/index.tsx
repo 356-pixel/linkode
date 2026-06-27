@@ -45,7 +45,7 @@ function Home() {
     setLoading(true);
     setResult(null);
     setTimeout(() => {
-      setResult(`https://www.example.com/${randomCode(5)}`);
+      setResult(`https://linkode.co/${randomCode(5)}`);
       setLoading(false);
     }, 1000);
   };
