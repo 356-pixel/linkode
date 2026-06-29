@@ -1,25 +1,17 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "linkode",
+  "name": "linkode-api",
   "main": "src/worker.js",
-  "compatibility_date": "2025-06-01",
-  "compatibility_flags": ["nodejs_compat"],
-  // Only deploy the Worker entry. Frontend files in this repo are ignored.
-  "rules": [
-    { "type": "ESModule", "globs": ["**/*.js"] }
-  ],
-  // KV namespace binding used by src/worker.js (env.LINK_KV).
-  // Replace the id/preview_id with the namespace IDs from your Cloudflare dashboard
-  // (Workers & Pages → KV → create namespace "LINK_KV").
+  "compatibility_date": "2026-06-29",
   "kv_namespaces": [
     {
       "binding": "LINK_KV",
-      "id": "REPLACE_WITH_KV_NAMESPACE_ID",
-      "preview_id": "REPLACE_WITH_KV_PREVIEW_NAMESPACE_ID"
+      "id": "8aeca36ce5e44cc1aff65de1ea27c6ee"
     }
   ],
-  // Route the Worker on your custom domain. Requires linkode.co to be on Cloudflare.
   "routes": [
-    { "pattern": "linkode.co/*", "zone_name": "linkode.co" }
+    {
+      "pattern": "linkode.co/api/*",
+      "zone_name": "linkode.co"
+    }
   ]
 }
