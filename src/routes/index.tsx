@@ -47,7 +47,7 @@ function Home() {
     setResult(null);
     const generatedSlug = randomCode(5);
     try {
-      const res = await fetch("https://linkode.co/create", {
+      const res = await fetch("https://linkode.co/api/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug: generatedSlug, target: normalized }),
