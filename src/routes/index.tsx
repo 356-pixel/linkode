@@ -49,18 +49,14 @@ function Home() {
 
     try {
       const slug = randomCode(5);
-      const res = await fetch('https://linkode.co/api/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ slug, target: trimmed })
+      await setDoc(doc(db, "links", slug), {
+        slug,
+        target: trimmed,
+        createdAt: serverTimestamp(),
       });
-      const data = await res.json();
-      if (data.ok) {
-        setResult(`https://linkode.co/${slug}`);
-      } else {
-        setError(data.error || "Something went wrong");
-      }
-    } catch {
+      setResult(`https://linkode.co/${slug}`);
+    } catch (err) {
+      console.error(err);
       setError("Failed to create link. Please try again.");
     }
     setLoading(false);
