@@ -52,8 +52,16 @@ function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug: generatedSlug, target: normalized }),
       });
-      if (!res.ok) throw new Error(`Request failed (${res.status})`);
-      await new Promise((r) => setTimeout(r, 400));
+      if (!res.ok) {
+        let message = `Request failed (${res.status})`;
+        try {
+          const data = await res.json();
+          if (data?.error) message = data.error;
+        } catch {
+          // ignore JSON parse error
+        }
+        throw new Error(message);
+      }
       setResult(`https://linkode.co/${generatedSlug}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create link. Please try again.");
