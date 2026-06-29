@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Link2, Copy, Check, RefreshCw, Sparkles, Shield, Zap, Globe } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
+import { db } from "@/lib/firebase";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export const Route = createFileRoute("/")({
   head: () => ({
