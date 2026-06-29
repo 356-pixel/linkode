@@ -36,38 +36,32 @@ function Home() {
       setError("Please enter a URL.");
       return;
     }
-    const normalized = trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
     try {
-      new URL(normalized);
+      new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
     } catch {
       setError("Please enter a valid URL.");
       return;
     }
     setLoading(true);
     setResult(null);
-    const generatedSlug = randomCode(5);
+
     try {
-      const res = await fetch("https://linkode.co/api/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: generatedSlug, target: normalized }),
+      const slug = randomCode(5);
+      const res = await fetch('https://linkode.co/api/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, target: trimmed })
       });
-      if (!res.ok) {
-        let message = `Request failed (${res.status})`;
-        try {
-          const data = await res.json();
-          if (data?.error) message = data.error;
-        } catch {
-          // ignore JSON parse error
-        }
-        throw new Error(message);
+      const data = await res.json();
+      if (data.ok) {
+        setResult(`https://linkode.co/${slug}`);
+      } else {
+        setError(data.error || "Something went wrong");
       }
-      setResult(`https://linkode.co/${generatedSlug}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create link. Please try again.");
-    } finally {
-      setLoading(false);
+    } catch {
+      setError("Failed to create link. Please try again.");
     }
+    setLoading(false);
   };
 
   const handleCopy = async () => {
