@@ -29,25 +29,37 @@ function Home() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setError(null);
     const trimmed = url.trim();
     if (!trimmed) {
       setError("Please enter a URL.");
       return;
     }
+    const normalized = trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
     try {
-      new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+      new URL(normalized);
     } catch {
       setError("Please enter a valid URL.");
       return;
     }
     setLoading(true);
     setResult(null);
-    setTimeout(() => {
-      setResult(`https://linkode.co/${randomCode(5)}`);
+    const generatedSlug = randomCode(5);
+    try {
+      const res = await fetch("https://linkode.co/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: generatedSlug, target: normalized }),
+      });
+      if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      await new Promise((r) => setTimeout(r, 400));
+      setResult(`https://linkode.co/${generatedSlug}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create link. Please try again.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleCopy = async () => {
