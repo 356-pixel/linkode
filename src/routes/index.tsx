@@ -42,7 +42,7 @@ function Home() {
     setResult(null);
 
     try {
-      const res = await fetch("https://linkode.co/api/shorten", {
+      const res = await fetch("https://linkode-api.kobila.workers.dev/api/shorten", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ destinationUrl }),
