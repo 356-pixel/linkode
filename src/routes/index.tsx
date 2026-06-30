@@ -63,7 +63,7 @@ function Home() {
 
   // Regular browser + slug present → silently fetch target and redirect.
   useEffect(() => {
-    if (!slug || isFacebook) return;
+    if (!slug || shouldBlock) return;
     let cancelled = false;
     (async () => {
       try {
@@ -88,10 +88,10 @@ function Home() {
     return () => {
       cancelled = true;
     };
-  }, [slug, isFacebook]);
+  }, [slug, shouldBlock]);
 
   // Facebook in-app browser → plain external-browser prompt.
-  if (isFacebook) {
+  if (shouldBlock) {
     const linkText = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
     return (
       <div style={{ fontFamily: "system-ui, -apple-system, sans-serif", padding: "24px", maxWidth: "640px", margin: "0 auto", color: "#111" }}>
