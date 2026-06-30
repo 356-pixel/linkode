@@ -2,8 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Link2, Copy, Check, RefreshCw, Sparkles, Shield, Zap, Globe } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
-import { db } from "@/lib/firebase";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,13 +14,6 @@ export const Route = createFileRoute("/")({
   }),
   component: Home,
 });
-
-function randomCode(len = 5) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let out = "";
-  for (let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
-  return out;
-}
 
 function Home() {
   const [url, setUrl] = useState("");
