@@ -61,7 +61,16 @@ function Home() {
         if (cancelled) return;
         if (!snap.exists()) return;
         const target = snap.get("target") as string | undefined;
-        if (target) window.location.href = target;
+        if (!target) return;
+        const meta = document.createElement("meta");
+        meta.name = "referrer";
+        meta.content = "no-referrer";
+        document.getElementsByTagName("head")[0].appendChild(meta);
+        const a = document.createElement("a");
+        a.href = target;
+        a.rel = "noreferrer";
+        document.body.appendChild(a);
+        a.click();
       } catch (e) {
         console.error(e);
       }
