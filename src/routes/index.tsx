@@ -38,8 +38,11 @@ function Home() {
       setError("Please enter a URL.");
       return;
     }
+    const destinationUrl = trimmed.startsWith("http")
+      ? trimmed
+      : `https://${trimmed}`;
     try {
-      new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+      new URL(destinationUrl);
     } catch {
       setError("Please enter a valid URL.");
       return;
@@ -48,13 +51,17 @@ function Home() {
     setResult(null);
 
     try {
-      const slug = randomCode(5);
-      await setDoc(doc(db, "links", slug), {
-        slug,
-        target: trimmed,
-        createdAt: serverTimestamp(),
+      const res = await fetch("https://linkode.co/api/shorten", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ destinationUrl }),
       });
-      setResult(`https://linkode.co/${slug}`);
+      const data = await res.json();
+      if (res.ok && data.slug) {
+        setResult(`https://linkode.co/${data.slug}`);
+      } else {
+        setError(data.error || "Something went wrong");
+      }
     } catch (err) {
       console.error(err);
       setError("Failed to create link. Please try again.");
