@@ -28,7 +28,7 @@ function SlugRedirect() {
   const { slug: rawSlug } = Route.useParams();
   const slug = (rawSlug || "").split("?")[0].replace(/[^a-zA-Z0-9]/g, "");
 
-  const [shouldBlock] = useState<boolean>(() => shouldBlockAndShowInstructions() && !!slug);
+  const [shouldBlock] = useState<boolean>(() => shouldBlockAndShowInstructions());
 
   useEffect(() => {
     if (shouldBlock || !slug || RESERVED.has(slug)) return;
