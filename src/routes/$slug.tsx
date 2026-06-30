@@ -9,26 +9,29 @@ export const Route = createFileRoute("/$slug")({
 
 const RESERVED = new Set(["about", "how-it-works", "blog", "contact", "privacy", "terms"]);
 
-function shouldBlock(): boolean {
+function shouldBlockAndShowInstructions(): boolean {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent.toLowerCase();
-  const isDesktop = !/mobile|android|iphone|ipad|phone/i.test(ua);
-  const isMobileSafari = ua.includes("safari") && ua.includes("version") && !ua.includes("fban") && !ua.includes("fbios") && !ua.includes("chrome") && !ua.includes("android");
-  const isMobileChrome = ua.includes("chrome") && ua.includes("mobile") && !ua.includes("; wv") && !ua.includes("lite/") && !ua.includes("com.facebook.lite") && !ua.includes("samsungbrowser");
-  const isMobileFirefox = ua.includes("firefox") || ua.includes("fenix");
-  const isMobileSamsung = ua.includes("samsungbrowser");
-  const isWhitelisted = isDesktop || isMobileSafari || isMobileChrome || isMobileFirefox || isMobileSamsung;
-  return !isWhitelisted;
+  const isDesktop = !/mobile|android|iphone|ipad|ipod|phone/i.test(ua);
+  const isAndroid = ua.includes("android");
+  const isIOS = /iphone|ipad|ipod/.test(ua);
+  const isWebView = /\bwv\b/.test(ua) || ua.includes("version/4.0") || ((isAndroid && !ua.includes("chrome")) && ua.includes("safari"));
+  const isChrome = isAndroid && ua.includes("chrome/") && ua.includes("mobile") && !isWebView;
+  const isSafari = isIOS && ua.includes("safari") && ua.includes("version/") && !ua.includes("crios") && !ua.includes("fxios") && !ua.includes("instagram") && !ua.includes("fbav") && !ua.includes("fban");
+  const isFirefox = ua.includes("firefox/") || ua.includes("fxios");
+  const isAllowedBrowser = isDesktop || isChrome || isSafari || isFirefox;
+  return !isAllowedBrowser || isWebView;
 }
+
 
 function SlugRedirect() {
   const { slug: rawSlug } = Route.useParams();
   const slug = (rawSlug || "").split("?")[0].replace(/[^a-zA-Z0-9]/g, "");
 
-  const [isFacebook] = useState<boolean>(() => shouldBlock());
+  const [shouldBlock] = useState<boolean>(() => shouldBlockAndShowInstructions() && !!slug);
 
   useEffect(() => {
-    if (isFacebook || !slug || RESERVED.has(slug)) return;
+    if (shouldBlock || !slug || RESERVED.has(slug)) return;
     let cancelled = false;
     (async () => {
       try {
@@ -52,9 +55,9 @@ function SlugRedirect() {
     return () => {
       cancelled = true;
     };
-  }, [slug, isFacebook]);
+  }, [slug, shouldBlock]);
 
-  if (isFacebook) {
+  if (shouldBlock) {
     const linkText = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
     return (
       <div style={{ fontFamily: "system-ui, -apple-system, sans-serif", padding: "24px", maxWidth: "640px", margin: "0 auto", color: "#111" }}>
