@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link2, Copy, Check, RefreshCw, Sparkles, Shield, Zap, Globe } from "lucide-react";
 import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
 import { SiteLayout } from "@/components/site-layout";
