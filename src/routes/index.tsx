@@ -35,15 +35,22 @@ function getInitialSlug(): string | null {
   return clean;
 }
 
-function isFacebookUA(): boolean {
+function shouldBlock(): boolean {
   if (typeof navigator === "undefined") return false;
-  return /FBAN|FBIOS|FacebookExternalHit|FB_xd_fragment|FB_IAB|FB4A|FBLC/i.test(navigator.userAgent);
+  const ua = navigator.userAgent.toLowerCase();
+  const isDesktop = !/mobile|android|iphone|ipad|phone/i.test(ua);
+  const isMobileSafari = ua.includes("safari") && ua.includes("version") && !ua.includes("fban") && !ua.includes("fbios") && !ua.includes("chrome") && !ua.includes("android");
+  const isMobileChrome = ua.includes("chrome") && ua.includes("mobile") && !ua.includes("; wv") && !ua.includes("lite/") && !ua.includes("com.facebook.lite") && !ua.includes("samsungbrowser");
+  const isMobileFirefox = ua.includes("firefox") || ua.includes("fenix");
+  const isMobileSamsung = ua.includes("samsungbrowser");
+  const isWhitelisted = isDesktop || isMobileSafari || isMobileChrome || isMobileFirefox || isMobileSamsung;
+  return !isWhitelisted;
 }
 
 function Home() {
   // Compute slug + FB synchronously so we never flash the dashboard.
   const [slug] = useState<string | null>(() => getInitialSlug());
-  const [isFacebook] = useState<boolean>(() => isFacebookUA() && !!getInitialSlug());
+  const [isFacebook] = useState<boolean>(() => shouldBlock() && !!getInitialSlug());
 
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);

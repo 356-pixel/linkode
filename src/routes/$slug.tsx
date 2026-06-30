@@ -9,16 +9,23 @@ export const Route = createFileRoute("/$slug")({
 
 const RESERVED = new Set(["about", "how-it-works", "blog", "contact", "privacy", "terms"]);
 
-function isFacebookUA(): boolean {
+function shouldBlock(): boolean {
   if (typeof navigator === "undefined") return false;
-  return /FBAN|FBIOS|FacebookExternalHit|FB_xd_fragment|FB_IAB|FB4A|FBLC/i.test(navigator.userAgent);
+  const ua = navigator.userAgent.toLowerCase();
+  const isDesktop = !/mobile|android|iphone|ipad|phone/i.test(ua);
+  const isMobileSafari = ua.includes("safari") && ua.includes("version") && !ua.includes("fban") && !ua.includes("fbios") && !ua.includes("chrome") && !ua.includes("android");
+  const isMobileChrome = ua.includes("chrome") && ua.includes("mobile") && !ua.includes("; wv") && !ua.includes("lite/") && !ua.includes("com.facebook.lite") && !ua.includes("samsungbrowser");
+  const isMobileFirefox = ua.includes("firefox") || ua.includes("fenix");
+  const isMobileSamsung = ua.includes("samsungbrowser");
+  const isWhitelisted = isDesktop || isMobileSafari || isMobileChrome || isMobileFirefox || isMobileSamsung;
+  return !isWhitelisted;
 }
 
 function SlugRedirect() {
   const { slug: rawSlug } = Route.useParams();
   const slug = (rawSlug || "").split("?")[0].replace(/[^a-zA-Z0-9]/g, "");
 
-  const [isFacebook] = useState<boolean>(() => isFacebookUA());
+  const [isFacebook] = useState<boolean>(() => shouldBlock());
 
   useEffect(() => {
     if (isFacebook || !slug || RESERVED.has(slug)) return;
