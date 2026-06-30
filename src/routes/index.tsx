@@ -37,16 +37,26 @@ function getInitialSlug(): string | null {
 
 function shouldBlockAndShowInstructions(): boolean {
   if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent.toLowerCase();
-  const isDesktop = !/mobile|android|iphone|ipad|ipod|phone/i.test(ua);
-  const isAndroid = ua.includes("android");
-  const isIOS = /iphone|ipad|ipod/.test(ua);
-  const isWebView = /\bwv\b/.test(ua) || ua.includes("version/4.0") || ((isAndroid && !ua.includes("chrome")) && ua.includes("safari"));
-  const isChrome = isAndroid && ua.includes("chrome/") && ua.includes("mobile") && !isWebView;
-  const isSafari = isIOS && ua.includes("safari") && ua.includes("version/") && !ua.includes("crios") && !ua.includes("fxios") && !ua.includes("instagram") && !ua.includes("fbav") && !ua.includes("fban");
-  const isFirefox = ua.includes("firefox/") || ua.includes("fxios");
-  const isAllowedBrowser = isDesktop || isChrome || isSafari || isFirefox;
-  return !isAllowedBrowser || isWebView;
+  const ua = navigator.userAgent;
+  const uaLower = ua.toLowerCase();
+
+  // Desktop users are never blocked, no matter what.
+  const isDesktop = !/mobile|android|iphone|ipad|ipod|phone/i.test(uaLower);
+  if (isDesktop) return false;
+
+  // Blacklist: Facebook family + Android WebView (covers FB / FB Lite webviews).
+  const isFacebookFamily = /FBAN|FBAV|FBIOS|FB_IAB|FB4A|FBLC|EMA/i.test(ua);
+  const isAndroidWebView = /;\s*wv\)/i.test(ua) || /\bwv\b/i.test(ua);
+  if (isFacebookFamily || isAndroidWebView) return true;
+
+  // Whitelist mobile: Chrome, Safari, Firefox.
+  const isAndroid = uaLower.includes("android");
+  const isIOS = /iphone|ipad|ipod/.test(uaLower);
+  const isMobileChrome = isAndroid && uaLower.includes("chrome/") && uaLower.includes("mobile");
+  const isMobileSafari = isIOS && uaLower.includes("safari") && uaLower.includes("version/") && !uaLower.includes("crios") && !uaLower.includes("fxios");
+  const isMobileFirefox = uaLower.includes("firefox/") || uaLower.includes("fxios");
+
+  return !(isMobileChrome || isMobileSafari || isMobileFirefox);
 }
 
 
