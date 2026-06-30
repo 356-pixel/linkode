@@ -30,20 +30,21 @@ function Home() {
   const [result, setResult] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [redirecting, setRedirecting] = useState(true);
+  const [redirecting, setRedirecting] = useState(false);
 
   // If a slug is passed via ?slug=... or via pathname, resolve it from Firestore.
   useEffect(() => {
     let cancelled = false;
     async function resolveSlug() {
+      const querySlug = new URLSearchParams(window.location.search).get("slug");
+      const pathSlug = window.location.pathname.replace(/^\/+/, "").split("/")[0];
+      const slug = querySlug || pathSlug;
+      if (!slug) {
+        // No slug present in either location → stay on the dashboard.
+        return;
+      }
+      setRedirecting(true);
       try {
-        const querySlug = new URLSearchParams(window.location.search).get("slug");
-        const pathSlug = window.location.pathname.replace(/^\/+/, "").split("/")[0];
-        const slug = querySlug || pathSlug;
-        if (!slug) {
-          setRedirecting(false);
-          return;
-        }
         const snap = await getDoc(doc(db, "links", slug));
         if (cancelled) return;
         if (!snap.exists()) {
@@ -77,6 +78,7 @@ function Home() {
       </div>
     );
   }
+
 
 
   const handleGenerate = async () => {
