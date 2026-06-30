@@ -7,80 +7,51 @@ export const Route = createFileRoute("/$slug")({
   component: SlugRedirect,
 });
 
-// Reserved paths that should not be treated as slugs (have their own routes).
-const RESERVED = new Set([
-  "about",
-  "how-it-works",
-  "blog",
-  "contact",
-  "privacy",
-  "terms",
-]);
+const RESERVED = new Set(["about", "how-it-works", "blog", "contact", "privacy", "terms"]);
+
+function isFacebookUA(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /FBAN|FBIOS|FacebookExternalHit|FB_xd_fragment|FB_IAB|FB4A/i.test(navigator.userAgent);
+}
 
 function SlugRedirect() {
-  const { slug } = Route.useParams();
-  const [status, setStatus] = useState<"loading" | "notfound" | "error">("loading");
+  const { slug: rawSlug } = Route.useParams();
+  const slug = (rawSlug || "").split("?")[0].replace(/[^a-zA-Z0-9]/g, "");
+
+  const [isFacebook] = useState<boolean>(() => isFacebookUA());
 
   useEffect(() => {
+    if (isFacebook || !slug || RESERVED.has(slug)) return;
     let cancelled = false;
-    async function go() {
+    (async () => {
       try {
-        // 1. Try the query parameter first, then fall back to the pathname.
-        const querySlug = new URLSearchParams(window.location.search).get("slug");
-        const pathSlug = window.location.pathname.replace(/^\/+/, "").split("/")[0] || slug;
-        const resolvedSlug = querySlug || pathSlug;
-
-        if (!resolvedSlug || RESERVED.has(resolvedSlug)) {
-          // No slug present → treat as home dashboard.
-          window.location.href = "/";
-          return;
-        }
-        const snap = await getDoc(doc(db, "links", resolvedSlug));
-        if (cancelled) return;
-        if (!snap.exists()) {
-          setStatus("notfound");
-          return;
-        }
+        const snap = await getDoc(doc(db, "links", slug));
+        if (cancelled || !snap.exists()) return;
         const target = snap.get("target") as string | undefined;
-        if (!target) {
-          setStatus("notfound");
-          return;
-        }
-        window.location.href = target;
+        if (target) window.location.href = target;
       } catch (e) {
         console.error(e);
-        if (!cancelled) setStatus("error");
       }
-    }
-    go();
+    })();
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, isFacebook]);
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="text-center">
-        {status === "loading" && (
-          <>
-            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-            <p className="mt-4 text-sm text-muted-foreground">Redirecting…</p>
-          </>
-        )}
-        {status === "notfound" && (
-          <>
-            <h1 className="text-2xl font-semibold text-foreground">Link not found</h1>
-            <p className="mt-2 text-sm text-muted-foreground">This Linkode link doesn't exist or has expired.</p>
-            <a href="/" className="mt-4 inline-block text-sm font-medium text-primary hover:underline">Go home</a>
-          </>
-        )}
-        {status === "error" && (
-          <>
-            <h1 className="text-2xl font-semibold text-foreground">Something went wrong</h1>
-            <p className="mt-2 text-sm text-muted-foreground">Please try again in a moment.</p>
-          </>
-        )}
+  if (isFacebook) {
+    const linkText = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
+    return (
+      <div style={{ fontFamily: "system-ui, -apple-system, sans-serif", padding: "24px", maxWidth: "640px", margin: "0 auto", color: "#111" }}>
+        <h1 style={{ fontSize: "28px", fontWeight: 700, margin: "0 0 16px" }}>Open in External Browser</h1>
+        <p style={{ fontSize: "16px", lineHeight: 1.5, margin: "0 0 16px" }}>
+          This website link: <strong>{linkText}</strong> doesn't support the Facebook in-app browser.
+        </p>
+        <p style={{ fontSize: "16px", lineHeight: 1.5, margin: 0 }}>
+          Please tap ⋮ (top-right) and choose: Open in External Browser
+        </p>
       </div>
-    </div>
-  );
+    );
+  }
+
+  return null;
 }
