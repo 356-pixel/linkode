@@ -35,22 +35,25 @@ function getInitialSlug(): string | null {
   return clean;
 }
 
-function shouldBlock(): boolean {
+function shouldBlockAndShowInstructions(): boolean {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent.toLowerCase();
-  const isDesktop = !/mobile|android|iphone|ipad|phone/i.test(ua);
-  const isMobileSafari = ua.includes("safari") && ua.includes("version") && !ua.includes("fban") && !ua.includes("fbios") && !ua.includes("chrome") && !ua.includes("android");
-  const isMobileChrome = ua.includes("chrome") && ua.includes("mobile") && !ua.includes("; wv") && !ua.includes("lite/") && !ua.includes("com.facebook.lite") && !ua.includes("samsungbrowser");
-  const isMobileFirefox = ua.includes("firefox") || ua.includes("fenix");
-  const isMobileSamsung = ua.includes("samsungbrowser");
-  const isWhitelisted = isDesktop || isMobileSafari || isMobileChrome || isMobileFirefox || isMobileSamsung;
-  return !isWhitelisted;
+  const isDesktop = !/mobile|android|iphone|ipad|ipod|phone/i.test(ua);
+  const isAndroid = ua.includes("android");
+  const isIOS = /iphone|ipad|ipod/.test(ua);
+  const isWebView = /\bwv\b/.test(ua) || ua.includes("version/4.0") || ((isAndroid && !ua.includes("chrome")) && ua.includes("safari"));
+  const isChrome = isAndroid && ua.includes("chrome/") && ua.includes("mobile") && !isWebView;
+  const isSafari = isIOS && ua.includes("safari") && ua.includes("version/") && !ua.includes("crios") && !ua.includes("fxios") && !ua.includes("instagram") && !ua.includes("fbav") && !ua.includes("fban");
+  const isFirefox = ua.includes("firefox/") || ua.includes("fxios");
+  const isAllowedBrowser = isDesktop || isChrome || isSafari || isFirefox;
+  return !isAllowedBrowser || isWebView;
 }
+
 
 function Home() {
   // Compute slug + FB synchronously so we never flash the dashboard.
   const [slug] = useState<string | null>(() => getInitialSlug());
-  const [isFacebook] = useState<boolean>(() => shouldBlock() && !!getInitialSlug());
+  const [shouldBlock] = useState<boolean>(() => shouldBlockAndShowInstructions() && !!getInitialSlug());
 
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -60,7 +63,7 @@ function Home() {
 
   // Regular browser + slug present → silently fetch target and redirect.
   useEffect(() => {
-    if (!slug || isFacebook) return;
+    if (!slug || shouldBlock) return;
     let cancelled = false;
     (async () => {
       try {
@@ -85,10 +88,10 @@ function Home() {
     return () => {
       cancelled = true;
     };
-  }, [slug, isFacebook]);
+  }, [slug, shouldBlock]);
 
   // Facebook in-app browser → plain external-browser prompt.
-  if (isFacebook) {
+  if (shouldBlock) {
     const linkText = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
     return (
       <div style={{ fontFamily: "system-ui, -apple-system, sans-serif", padding: "24px", maxWidth: "640px", margin: "0 auto", color: "#111" }}>
