@@ -24,60 +24,75 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
+const RESERVED = new Set(["about", "how-it-works", "blog", "contact", "privacy", "terms"]);
+
+function getInitialSlug(): string | null {
+  if (typeof window === "undefined") return null;
+  const raw = window.location.pathname.replace(/^\/+/, "").split("/")[0] || "";
+  // Strip any query-style residue and keep only alphanumerics.
+  const clean = raw.split("?")[0].replace(/[^a-zA-Z0-9]/g, "");
+  if (!clean || RESERVED.has(clean)) return null;
+  return clean;
+}
+
+function isFacebookUA(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /FBAN|FBIOS|FacebookExternalHit|FB_xd_fragment|FB_IAB|FB4A/i.test(navigator.userAgent);
+}
+
 function Home() {
+  // Compute slug + FB synchronously so we never flash the dashboard.
+  const [slug] = useState<string | null>(() => getInitialSlug());
+  const [isFacebook] = useState<boolean>(() => isFacebookUA() && !!getInitialSlug());
+
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [redirecting, setRedirecting] = useState(false);
 
-  // If a slug is passed via ?slug=... or via pathname, resolve it from Firestore.
+  // Regular browser + slug present → silently fetch target and redirect.
   useEffect(() => {
+    if (!slug || isFacebook) return;
     let cancelled = false;
-    async function resolveSlug() {
-      const querySlug = new URLSearchParams(window.location.search).get("slug");
-      const pathSlug = window.location.pathname.replace(/^\/+/, "").split("/")[0];
-      const slug = querySlug || pathSlug;
-      if (!slug) {
-        // No slug present in either location → stay on the dashboard.
-        return;
-      }
-      setRedirecting(true);
+    (async () => {
       try {
         const snap = await getDoc(doc(db, "links", slug));
         if (cancelled) return;
-        if (!snap.exists()) {
-          setRedirecting(false);
-          return;
-        }
+        if (!snap.exists()) return;
         const target = snap.get("target") as string | undefined;
-        if (!target) {
-          setRedirecting(false);
-          return;
-        }
-        window.location.href = target;
+        if (target) window.location.href = target;
       } catch (e) {
         console.error(e);
-        if (!cancelled) setRedirecting(false);
       }
-    }
-    resolveSlug();
+    })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [slug, isFacebook]);
 
-  if (redirecting) {
+  // Facebook in-app browser → plain external-browser prompt.
+  if (isFacebook) {
+    const linkText = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4">
-        <div className="text-center">
-          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          <p className="mt-4 text-sm text-muted-foreground">Redirecting…</p>
-        </div>
+      <div style={{ fontFamily: "system-ui, -apple-system, sans-serif", padding: "24px", maxWidth: "640px", margin: "0 auto", color: "#111" }}>
+        <h1 style={{ fontSize: "28px", fontWeight: 700, margin: "0 0 16px" }}>Open in External Browser</h1>
+        <p style={{ fontSize: "16px", lineHeight: 1.5, margin: "0 0 16px" }}>
+          This website link: <strong>{linkText}</strong> doesn't support the Facebook in-app browser.
+        </p>
+        <p style={{ fontSize: "16px", lineHeight: 1.5, margin: 0 }}>
+          Please tap ⋮ (top-right) and choose: Open in External Browser
+        </p>
       </div>
     );
   }
+
+  // Regular browser with slug → render nothing while redirecting.
+  if (slug) {
+    return null;
+  }
+
+
 
 
 
