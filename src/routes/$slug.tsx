@@ -25,13 +25,17 @@ function SlugRedirect() {
     let cancelled = false;
     async function go() {
       try {
-        // Prefer the live pathname in case of edge rewrites.
+        // 1. Try the query parameter first, then fall back to the pathname.
+        const querySlug = new URLSearchParams(window.location.search).get("slug");
         const pathSlug = window.location.pathname.replace(/^\/+/, "").split("/")[0] || slug;
-        if (!pathSlug || RESERVED.has(pathSlug)) {
-          setStatus("notfound");
+        const resolvedSlug = querySlug || pathSlug;
+
+        if (!resolvedSlug || RESERVED.has(resolvedSlug)) {
+          // No slug present → treat as home dashboard.
+          window.location.href = "/";
           return;
         }
-        const snap = await getDoc(doc(db, "links", pathSlug));
+        const snap = await getDoc(doc(db, "links", resolvedSlug));
         if (cancelled) return;
         if (!snap.exists()) {
           setStatus("notfound");
