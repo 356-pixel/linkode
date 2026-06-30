@@ -2,8 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Link2, Copy, Check, RefreshCw, Sparkles, Shield, Zap, Globe } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
-import { db } from "@/lib/firebase";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,13 +14,6 @@ export const Route = createFileRoute("/")({
   }),
   component: Home,
 });
-
-function randomCode(len = 5) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let out = "";
-  for (let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
-  return out;
-}
 
 function Home() {
   const [url, setUrl] = useState("");
@@ -38,8 +29,11 @@ function Home() {
       setError("Please enter a URL.");
       return;
     }
+    const destinationUrl = trimmed.startsWith("http")
+      ? trimmed
+      : `https://${trimmed}`;
     try {
-      new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+      new URL(destinationUrl);
     } catch {
       setError("Please enter a valid URL.");
       return;
@@ -48,13 +42,17 @@ function Home() {
     setResult(null);
 
     try {
-      const slug = randomCode(5);
-      await setDoc(doc(db, "links", slug), {
-        slug,
-        target: trimmed,
-        createdAt: serverTimestamp(),
+      const res = await fetch("https://linkode.co/api/shorten", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ destinationUrl }),
       });
-      setResult(`https://linkode.co/${slug}`);
+      const data = await res.json();
+      if (res.ok && data.slug) {
+        setResult(`https://linkode.co/${data.slug}`);
+      } else {
+        setError(data.error || "Something went wrong");
+      }
     } catch (err) {
       console.error(err);
       setError("Failed to create link. Please try again.");
