@@ -11,7 +11,7 @@ const RESERVED = new Set(["about", "how-it-works", "blog", "contact", "privacy",
 
 function isFacebookUA(): boolean {
   if (typeof navigator === "undefined") return false;
-  return /FBAN|FBIOS|FacebookExternalHit|FB_xd_fragment|FB_IAB|FB4A/i.test(navigator.userAgent);
+  return /FBAN|FBIOS|FacebookExternalHit|FB_xd_fragment|FB_IAB|FB4A|FBLC/i.test(navigator.userAgent);
 }
 
 function SlugRedirect() {

@@ -37,7 +37,7 @@ function getInitialSlug(): string | null {
 
 function isFacebookUA(): boolean {
   if (typeof navigator === "undefined") return false;
-  return /FBAN|FBIOS|FacebookExternalHit|FB_xd_fragment|FB_IAB|FB4A/i.test(navigator.userAgent);
+  return /FBAN|FBIOS|FacebookExternalHit|FB_xd_fragment|FB_IAB|FB4A|FBLC/i.test(navigator.userAgent);
 }
 
 function Home() {
