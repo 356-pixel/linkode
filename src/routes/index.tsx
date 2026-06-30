@@ -165,7 +165,7 @@ function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-hero">
         <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, oklch(0.62 0.17 250 / 0.25), transparent 40%), radial-gradient(circle at 80% 60%, oklch(0.58 0.18 258 / 0.2), transparent 50%)" }} />
-        <div className="relative mx-auto max-w-5xl px-4 pt-16 pb-20 sm:px-6 sm:pt-24 sm:pb-28 lg:px-8">
+        <div className="relative mx-auto max-w-5xl px-4 pt-12 pb-20 sm:px-6 sm:pt-24 sm:pb-28 lg:px-8">
           <div className="flex flex-col items-center text-center">
             <span className="hidden sm:inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
