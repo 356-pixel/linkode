@@ -53,7 +53,7 @@ function shouldBlockAndShowInstructions(): boolean {
 function Home() {
   // Compute slug + FB synchronously so we never flash the dashboard.
   const [slug] = useState<string | null>(() => getInitialSlug());
-  const [isFacebook] = useState<boolean>(() => shouldBlock() && !!getInitialSlug());
+  const [shouldBlock] = useState<boolean>(() => shouldBlockAndShowInstructions() && !!getInitialSlug());
 
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
