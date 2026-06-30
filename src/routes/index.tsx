@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link2, Copy, Check, RefreshCw, Sparkles, Shield, Zap, Globe } from "lucide-react";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
 import { SiteLayout } from "@/components/site-layout";
 import { db } from "@/lib/firebase";
 
@@ -30,6 +30,54 @@ function Home() {
   const [result, setResult] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [redirecting, setRedirecting] = useState(true);
+
+  // If a slug is passed via ?slug=... or via pathname, resolve it from Firestore.
+  useEffect(() => {
+    let cancelled = false;
+    async function resolveSlug() {
+      try {
+        const querySlug = new URLSearchParams(window.location.search).get("slug");
+        const pathSlug = window.location.pathname.replace(/^\/+/, "").split("/")[0];
+        const slug = querySlug || pathSlug;
+        if (!slug) {
+          setRedirecting(false);
+          return;
+        }
+        const snap = await getDoc(doc(db, "links", slug));
+        if (cancelled) return;
+        if (!snap.exists()) {
+          setRedirecting(false);
+          return;
+        }
+        const target = snap.get("target") as string | undefined;
+        if (!target) {
+          setRedirecting(false);
+          return;
+        }
+        window.location.href = target;
+      } catch (e) {
+        console.error(e);
+        if (!cancelled) setRedirecting(false);
+      }
+    }
+    resolveSlug();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (redirecting) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="text-center">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="mt-4 text-sm text-muted-foreground">Redirecting…</p>
+        </div>
+      </div>
+    );
+  }
+
 
   const handleGenerate = async () => {
     setError(null);
