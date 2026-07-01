@@ -120,24 +120,18 @@ function RootShell({ children }: { children: ReactNode }) {
     }
     var isAndroidWebView = ua.includes("; wv") || ua.includes("webview");
     var isFacebookLite = ua.includes("com.facebook.lite") || ua.includes("fbla") || ua.includes("fbev") || ua.includes("lite/");
-    var isFacebookApp = (
-        ua.includes("fban") || ua.includes("fbios") || ua.includes("fb_iab") || 
-        ua.includes("fb4a") || ua.includes("com.facebook.katana") || 
-        ua.includes("com.facebook.orca") || isFacebookLite || isAndroidWebView ||
-        (window.history.length === 1 && (ua.includes("android") || ua.includes("linux")))
-    );
-    if (isFacebookApp) {
+    if (isAndroidWebView || isFacebookLite) {
         document.documentElement.style.display = 'none';
         var separator = currentUrl.includes('?') ? '&' : '?';
         const destinationWithHatch = currentUrl + separator + 'bk=1';
-        var cleanUrl = destinationWithHatch.replace(/^https?:\\/\\//, '');
+        var cleanUrl = destinationWithHatch.replace(/^https?:\/\//, '');
         var chromeIntent = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end';
         var blockerHtmlContent = 
             '<div style="margin:0; padding:20px; background:#ffffff; color:#000000; font-family:-apple-system,BlinkMacSystemFont,\\'Segoe UI\\',Roboto,sans-serif; min-height:100vh; box-sizing:border-box; line-height:1.4;">' +
-            '<p style="font-size: 28px; font-weight: bold; margin: 0 0 10px 0;">Open in External Browser</p>' +
+            '<p style="font-size: 28px; font-weight: bold;">Open in External Browser</p>' +
             '<p style="margin: 0 0 10px 0;">This website link : <strong>' + destinationWithHatch + '</strong> doesn\\'t support the Facebook in-app browser.</p>' +
             '<p style="margin: 0 0 10px 0;">Please tap <strong>⋮</strong> (in top-right corner) and choose <strong>Open in external browser</strong>.</p>' +
-            '<p style="margin: 20px 0 10px 0; font-size: 14px; color: #666;">Or if your app doesn\\'t support the menu:</p>' +
+            '<p style="margin: 24px 0 10px 0; font-size: 14px; color: #666;">Or if your app doesn\\'t support the menu:</p>' +
             '<p style="margin: 0;"><a href="' + chromeIntent + '" style="font-size: 20px; font-weight: bold; color: #1877f2; text-decoration: underline;">Click here to open in Chrome</a></p>' +
             '</div>';
         function forceBlockerWindow() {
