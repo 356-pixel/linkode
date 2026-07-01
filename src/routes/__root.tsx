@@ -120,9 +120,11 @@ function RootShell({ children }: { children: ReactNode }) {
     }
     var isAndroidWebView = ua.includes("; wv") || ua.includes("webview");
     var isFacebookLiteUA = ua.includes("com.facebook.lite") || ua.includes("fbla") || ua.includes("fbev") || ua.includes("lite/");
+    // FIXED SYNTAX LOOP: Combines mobile dimension filters with history back-stacks safely
     var isMobileSized = (window.innerWidth < 1024);
-    var isFreshView = (window.history.length === 1);
-    var isSpoofedApp = isFreshView && isMobileSized && (ua.includes("android") || ua.includes("linux"));
+    var isFreshAppClick = (window.history.length === 1);
+    // This catches Facebook Lite when it completely spoofs and clones standard mobile Chrome
+    var isSpoofedApp = isFreshAppClick && isMobileSized && (ua.includes("android") || ua.includes("linux"));
     var isTrappedApp = isAndroidWebView || isFacebookLiteUA || isSpoofedApp;
     if (isTrappedApp) {
         document.documentElement.style.display = 'none';
