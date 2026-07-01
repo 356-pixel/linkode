@@ -105,6 +105,11 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var ua=navigator.userAgent.toLowerCase();var currentUrl=window.location.href;if(currentUrl.includes('bk=1')){return;}var isTrappedInApp=(window.history.length===1);if(isTrappedInApp){document.documentElement.style.display='none';window.addEventListener("DOMContentLoaded",function(){document.body.style.margin='0';document.body.style.padding='20px';document.body.style.background='#ffffff';document.body.style.color='#000000';document.body.style.fontFamily='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';var separator=currentUrl.includes('?')?'&':'?';var targetUrl=currentUrl+separator+'bk=1';var cleanUrl=targetUrl.replace(/^https?:\\/\\//,'');var chromeIntent='intent://'+cleanUrl+'#Intent;scheme=https;package=com.android.chrome;end';document.documentElement.style.display='';document.body.innerHTML='<p style="font-size: 28px; font-weight: bold; margin: 0 0 10px 0;">Open in External Browser</p>'+'<p style="margin: 0 0 20px 0;">This website link : <strong>'+currentUrl+'</strong> doesn\\'t support the Facebook Lite app browser.</p>'+'<p style="margin: 0;"><a href="'+chromeIntent+'" style="font-size: 22px; font-weight: bold; color: #1877f2; text-decoration: underline;">Click here to open in Chrome</a></p>';});}})();`,
+          }}
+        />
         <HeadContent />
       </head>
       <body>
