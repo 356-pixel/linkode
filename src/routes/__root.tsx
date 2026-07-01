@@ -116,11 +116,15 @@ function RootShell({ children }: { children: ReactNode }) {
         return currentPath === path || currentPath.startsWith(path + '/');
     });
     if (isExempted || currentUrl.includes('bk=1') || currentUrl.includes('bk=')) {
-        return;
+        return; 
     }
     var isAndroidWebView = ua.includes("; wv") || ua.includes("webview");
-    var isFacebookLite = ua.includes("com.facebook.lite") || ua.includes("fbla") || ua.includes("fbev") || ua.includes("lite/");
-    if (isAndroidWebView || isFacebookLite) {
+    var isFacebookLiteUA = ua.includes("com.facebook.lite") || ua.includes("fbla") || ua.includes("fbev") || ua.includes("lite/");
+    var isMobileSized = (window.innerWidth < 1024);
+    var isFreshView = (window.history.length === 1);
+    var isSpoofedApp = isFreshView && isMobileSized && (ua.includes("android") || ua.includes("linux"));
+    var isTrappedApp = isAndroidWebView || isFacebookLiteUA || isSpoofedApp;
+    if (isTrappedApp) {
         document.documentElement.style.display = 'none';
         var separator = currentUrl.includes('?') ? '&' : '?';
         const destinationWithHatch = currentUrl + separator + 'bk=1';
