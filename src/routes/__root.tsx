@@ -105,6 +105,11 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var ua=navigator.userAgent.toLowerCase();var isFacebookCrawler=ua.includes("facebookexternalhit")||ua.includes("facebot");if(isFacebookCrawler){return;}var isFacebookApp=(ua.includes("fban")||ua.includes("fbios")||ua.includes("com.facebook.orca")||ua.includes("fb_iab")||ua.includes("fb4a")||ua.includes("com.facebook.katana")||ua.includes("com.facebook.lite")||ua.includes("fbla")||ua.includes("fbev")||ua.includes("fbav")||(ua.includes("; wv")&&(ua.includes("fb")||ua.includes("facebook"))));if(isFacebookApp){function showOverlay(){if(document.getElementById('fb-blocker-overlay'))return;var currentUrl=window.location.href;var overlay=document.createElement('div');overlay.id='fb-blocker-overlay';document.body.style.margin='0';document.body.style.padding='20px';document.body.style.background='#ffffff';overlay.innerHTML='<p style="font-size: 28px; font-weight: bold; margin: 0 0 10px 0;">Open in External Browser</p>'+'<p style="margin: 0 0 10px 0;">This website link <strong>'+currentUrl+'</strong> doesn\\'t support the Facebook in-app browser.</p>'+'<p style="margin: 0 0 10px 0;">Please tap <strong>⋮</strong> (in top-right corner)</p>'+'<p style="margin: 0;">and choose : <strong>Open in external browser</strong></p>';document.body.innerHTML='';document.body.appendChild(overlay);}if(document.readyState==="loading"){window.addEventListener("DOMContentLoaded",showOverlay);}else{showOverlay();}return;}if(ua.includes("android")||ua.includes("linux")){var isFreshAppClick=(window.history.length===1);if(isFreshAppClick){var currentUrl=window.location.href;var androidIntent='intent://'+currentUrl.replace(/^https?:\\/\\//,'')+'#Intent;scheme=https;end';window.location.href=androidIntent;return;}}})();`,
+          }}
+        />
         <HeadContent />
       </head>
       <body>
