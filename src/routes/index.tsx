@@ -163,7 +163,7 @@ function Home() {
                   type="url"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Paste your xcessly URL here (e.g., https://mywebsite.com/article)..."
+                  placeholder="Paste your website link here"
                   className="flex-1 rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground outline-none transition-all placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/30"
                   disabled={loading}
                 />
