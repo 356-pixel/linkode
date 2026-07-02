@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { Menu, X } from "lucide-react";
-import logoAsset from "@/assets/linkode-logo.svg.asset.json";
+import { Menu, X, Link2 } from "lucide-react";
 
 const navItems = [
   { to: "/", label: "Home" },
