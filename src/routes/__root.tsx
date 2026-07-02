@@ -108,39 +108,8 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function() {
-    var ua = navigator.userAgent.toLowerCase();
-    var currentUrl = window.location.href;
-    var currentPath = window.location.pathname.toLowerCase();
-    if (currentPath === '/fb-fallback.html') { return; }
-    var exemptedPaths = ['/about', '/how-it-works', '/blogs'];
-    var isExempted = exemptedPaths.some(function(path) {
-        return currentPath === path || currentPath.startsWith(path + '/');
-    });
-    if (isExempted || currentUrl.includes('bk=1') || currentUrl.includes('bk=')) {
-        return;
-    }
-    var isAndroidWebView = ua.includes("; wv") || ua.includes("webview");
-    var isFacebookLiteUA = ua.includes("com.facebook.lite") || ua.includes("fbla") || ua.includes("fbev") || ua.includes("lite/");
-    var isMobileSized = (window.innerWidth < 1024);
-    var isFreshAppClick = (window.history.length === 1);
-    var isSpoofedApp = isFreshAppClick && isMobileSized && (ua.includes("android") || ua.includes("linux"));
-    var isTrappedApp = isAndroidWebView || isFacebookLiteUA || isSpoofedApp;
-    if (isTrappedApp) {
-        var osType = (ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod')) ? 'ios' : 'android';
-        var origPath = window.location.pathname + window.location.search + window.location.hash;
-        var origEncoded = '';
-        try { origEncoded = btoa(origPath); } catch (e) { origEncoded = ''; }
-        var fallbackUrl = '/fb-fallback.html?os=' + osType + '&orig=' + encodeURIComponent(origEncoded);
-        window.location.replace(fallbackUrl);
-    }
-})();`,
-
-          }}
-        />
         <HeadContent />
+
       </head>
       <body>
         {children}
