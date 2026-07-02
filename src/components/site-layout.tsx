@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { Menu, X, Link2 } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import logoAsset from "@/assets/linkode-logo.svg.asset.json";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -18,9 +19,11 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2 group">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-primary shadow-soft transition-transform group-hover:scale-105">
-              <Link2 className="h-5 w-5 text-primary-foreground" />
-            </span>
+            <img
+              src={logoAsset.url}
+              alt="Linkode"
+              className="h-9 w-9 rounded-lg shadow-soft transition-transform group-hover:scale-105"
+            />
             <span className="text-xl font-bold tracking-tight text-foreground">
               Linkode
             </span>
@@ -85,9 +88,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           <div className="grid gap-8 md:grid-cols-4">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-primary">
-                  <Link2 className="h-4 w-4 text-primary-foreground" />
-                </span>
+                <img src={logoAsset.url} alt="Linkode" className="h-8 w-8 rounded-lg" />
                 <span className="text-lg font-bold">Linkode</span>
               </div>
               <p className="mt-3 max-w-sm text-sm text-muted-foreground">
