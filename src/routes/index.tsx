@@ -35,35 +35,9 @@ function getInitialSlug(): string | null {
   return clean;
 }
 
-function shouldBlockAndShowInstructions(): boolean {
-  if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent;
-  const uaLower = ua.toLowerCase();
-
-  // Desktop users are never blocked, no matter what.
-  const isDesktop = !/mobile|android|iphone|ipad|ipod|phone/i.test(uaLower);
-  if (isDesktop) return false;
-
-  // Blacklist: Facebook family + Android WebView (covers FB / FB Lite webviews).
-  const isFacebookFamily = /FBAN|FBAV|FBIOS|FB_IAB|FB4A|FBLC|EMA/i.test(ua);
-  const isAndroidWebView = /;\s*wv\)/i.test(ua) || /\bwv\b/i.test(ua);
-  if (isFacebookFamily || isAndroidWebView) return true;
-
-  // Whitelist mobile: Chrome, Safari, Firefox.
-  const isAndroid = uaLower.includes("android");
-  const isIOS = /iphone|ipad|ipod/.test(uaLower);
-  const isMobileChrome = isAndroid && uaLower.includes("chrome/") && uaLower.includes("mobile");
-  const isMobileSafari = isIOS && uaLower.includes("safari") && uaLower.includes("version/") && !uaLower.includes("crios") && !uaLower.includes("fxios");
-  const isMobileFirefox = uaLower.includes("firefox/") || uaLower.includes("fxios");
-
-  return !(isMobileChrome || isMobileSafari || isMobileFirefox);
-}
-
-
 function Home() {
-  // Compute slug + block status synchronously so we never flash the wrong UI.
+  // Compute slug synchronously so we never flash the wrong UI.
   const [slug] = useState<string | null>(() => getInitialSlug());
-  const [shouldBlock] = useState<boolean>(() => shouldBlockAndShowInstructions());
 
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -71,9 +45,9 @@ function Home() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Regular browser + slug present → silently fetch target and redirect.
+  // Slug present → silently fetch target and redirect.
   useEffect(() => {
-    if (!slug || shouldBlock) return;
+    if (!slug) return;
     let cancelled = false;
     (async () => {
       try {
@@ -98,28 +72,13 @@ function Home() {
     return () => {
       cancelled = true;
     };
-  }, [slug, shouldBlock]);
+  }, [slug]);
 
-  // Facebook in-app browser → plain external-browser prompt.
-  if (shouldBlock) {
-    const linkText = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
-    return (
-      <div style={{ fontFamily: "system-ui, -apple-system, sans-serif", padding: "24px", maxWidth: "640px", margin: "0 auto", color: "#111" }}>
-        <h1 style={{ fontSize: "28px", fontWeight: 700, margin: "0 0 16px" }}>Open in External Browser</h1>
-        <p style={{ fontSize: "16px", lineHeight: 1.5, margin: "0 0 16px" }}>
-          This website link: <strong>{linkText}</strong> doesn't support the Facebook in-app browser.
-        </p>
-        <p style={{ fontSize: "16px", lineHeight: 1.5, margin: 0 }}>
-          Please tap ⋮ (top-right) and choose: Open in External Browser
-        </p>
-      </div>
-    );
-  }
-
-  // Regular browser with slug → render nothing while redirecting.
+  // Slug present → render nothing while redirecting.
   if (slug) {
     return null;
   }
+
 
 
 
