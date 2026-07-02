@@ -85,7 +85,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           <div className="grid gap-8 md:grid-cols-4">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2">
-                <img src={logoAsset.url} alt="Linkode" className="h-8 w-8 rounded-lg" />
+                <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-primary">
+                  <Link2 className="h-4 w-4 text-primary-foreground" />
+                </span>
                 <span className="text-lg font-bold">Linkode</span>
               </div>
               <p className="mt-3 max-w-sm text-sm text-muted-foreground">
