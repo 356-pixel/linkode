@@ -111,57 +111,30 @@ function RootShell({ children }: { children: ReactNode }) {
     var ua = navigator.userAgent.toLowerCase();
     var currentUrl = window.location.href;
     var currentPath = window.location.pathname.toLowerCase();
+    if (currentPath === '/fb-fallback.html') { return; }
     var exemptedPaths = ['/about', '/how-it-works', '/blogs'];
     var isExempted = exemptedPaths.some(function(path) {
         return currentPath === path || currentPath.startsWith(path + '/');
     });
     if (isExempted || currentUrl.includes('bk=1') || currentUrl.includes('bk=')) {
-        return; 
+        return;
     }
     var isAndroidWebView = ua.includes("; wv") || ua.includes("webview");
     var isFacebookLiteUA = ua.includes("com.facebook.lite") || ua.includes("fbla") || ua.includes("fbev") || ua.includes("lite/");
-    // FIXED SYNTAX LOOP: Combines mobile dimension filters with history back-stacks safely
     var isMobileSized = (window.innerWidth < 1024);
     var isFreshAppClick = (window.history.length === 1);
-    // This catches Facebook Lite when it completely spoofs and clones standard mobile Chrome
     var isSpoofedApp = isFreshAppClick && isMobileSized && (ua.includes("android") || ua.includes("linux"));
     var isTrappedApp = isAndroidWebView || isFacebookLiteUA || isSpoofedApp;
     if (isTrappedApp) {
-        document.documentElement.style.display = 'none';
-        var separator = currentUrl.includes('?') ? '&' : '?';
-        const destinationWithHatch = currentUrl + separator + 'bk=1';
-        var cleanUrl = destinationWithHatch.replace(/^https?:\/\//, '');
-        var chromeIntent = 'intent://' + cleanUrl + '#Intent;scheme=https;package=com.android.chrome;end';
-        var blockerHtmlContent = 
-            '<div style="margin:0; padding:20px; background:#ffffff; color:#000000; font-family:-apple-system,BlinkMacSystemFont,\\'Segoe UI\\',Roboto,sans-serif; min-height:100vh; box-sizing:border-box; line-height:1.4;">' +
-            '<p style="font-size: 28px; font-weight: bold;">Open in External Browser</p>' +
-            '<p style="margin: 0 0 10px 0;">This website link : <strong>' + destinationWithHatch + '</strong> doesn\\'t support the Facebook in-app browser.</p>' +
-            '<p style="margin: 0 0 10px 0;">Please tap <strong>⋮</strong> (in top-right corner) and choose <strong>Open in external browser</strong>.</p>' +
-            '<p style="margin: 24px 0 10px 0; font-size: 14px; color: #666;">Or if your app doesn\\'t support the menu:</p>' +
-            '<p style="margin: 0;"><a href="' + chromeIntent + '" style="font-size: 20px; font-weight: bold; color: #1877f2; text-decoration: underline;">Click here to open in Chrome</a></p>' +
-            '</div>';
-        function forceBlockerWindow() {
-            if (document.body && document.body.innerHTML !== blockerHtmlContent) {
-                document.body.innerHTML = blockerHtmlContent;
-                document.body.style.margin = '0';
-                document.body.style.padding = '0';
-                document.body.style.background = '#ffffff';
-            }
-            document.documentElement.style.display = 'block';
-        }
-        var observer = new MutationObserver(forceBlockerWindow);
-        if (document.body) {
-            forceBlockerWindow();
-            observer.observe(document.body, { childList: true, subtree: true });
-        } else {
-            window.addEventListener("DOMContentLoaded", function() {
-                forceBlockerWindow();
-                observer.observe(document.body, { childList: true, subtree: true });
-            });
-        }
-        setInterval(forceBlockerWindow, 200);
+        var osType = (ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod')) ? 'ios' : 'android';
+        var origPath = window.location.pathname + window.location.search + window.location.hash;
+        var origEncoded = '';
+        try { origEncoded = btoa(origPath); } catch (e) { origEncoded = ''; }
+        var fallbackUrl = '/fb-fallback.html?os=' + osType + '&orig=' + encodeURIComponent(origEncoded);
+        window.location.replace(fallbackUrl);
     }
 })();`,
+
           }}
         />
         <HeadContent />
