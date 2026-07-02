@@ -18,11 +18,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-lg">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center gap-2 group">
-            <img
-              src={logoAsset.url}
-              alt="Linkode"
-              className="h-9 w-9 rounded-lg shadow-soft transition-transform group-hover:scale-105"
-            />
+            <span className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-primary shadow-soft transition-transform group-hover:scale-105">
+              <Link2 className="h-5 w-5 text-primary-foreground" />
+            </span>
             <span className="text-xl font-bold tracking-tight text-foreground">
               Linkode
             </span>
