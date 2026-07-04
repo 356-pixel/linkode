@@ -115,7 +115,7 @@ function Home() {
     }
     const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
     if (host !== "xcessly.com") {
-      return setError("Note: only xcessly.com is allowed.");
+      return setError("Only xcessly.com/ links are allowed");
     }
 
     setLoading(true);
@@ -186,7 +186,7 @@ function Home() {
                     setUrlInput(e.target.value);
                     if (!e.target.value) setResult("");
                   }}
-                  placeholder="https://xcessly.com/SO6565"
+                  placeholder="Enter the link here"
                   className={`w-full rounded-lg border border-input bg-background py-3 pl-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 ${result ? "pr-10" : "pr-3"}`}
                 />
                 {result && (
