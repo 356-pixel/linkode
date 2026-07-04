@@ -182,10 +182,23 @@ function Home() {
                 <input
                   type="text"
                   value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
-                  placeholder="Paste your website link here"
-                  className="w-full rounded-lg border border-input bg-background py-3 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  onChange={(e) => {
+                    setUrlInput(e.target.value);
+                    if (!e.target.value) setResult("");
+                  }}
+                  placeholder="https://xcessly.com/SO6565"
+                  className={`w-full rounded-lg border border-input bg-background py-3 pl-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 ${result ? "pr-10" : "pr-3"}`}
                 />
+                {result && (
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    aria-label="Reset"
+                    className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                  </button>
+                )}
               </div>
               <button
                 type="submit"
