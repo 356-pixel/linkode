@@ -115,7 +115,7 @@ function Home() {
     }
     const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
     if (host !== "xcessly.com") {
-      return setError("Note: only xcessly.com is allowed.");
+      return setError("Only xcessly.com/ links are allowed");
     }
 
     setLoading(true);
