@@ -107,10 +107,15 @@ function Home() {
     let target = urlInput.trim();
     if (!target) return setError("Please paste a website link.");
     if (!/^https?:\/\//i.test(target)) target = "https://" + target;
+    let parsed: URL;
     try {
-      new URL(target);
+      parsed = new URL(target);
     } catch {
       return setError("That doesn't look like a valid URL.");
+    }
+    const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    if (host !== "xcessly.com") {
+      return setError("Note: only xcessly.com is allowed.");
     }
 
     setLoading(true);
@@ -130,6 +135,14 @@ function Home() {
       setLoading(false);
     }
   }
+
+  function handleReset() {
+    setUrlInput("");
+    setResult("");
+    setError("");
+    setCopied(false);
+  }
+
 
   async function handleCopy() {
     if (!result) return;
