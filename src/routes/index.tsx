@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { doc, getDoc, setDoc, updateDoc, increment, serverTimestamp } from "firebase/firestore";
-import { Link2, Copy, Check, Loader2, Sparkles, Zap, Shield } from "lucide-react";
+import { Link2, Copy, Check, Loader2, Sparkles, Zap, Shield, RotateCcw } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { SiteLayout } from "@/components/site-layout";
 
@@ -107,10 +107,15 @@ function Home() {
     let target = urlInput.trim();
     if (!target) return setError("Please paste a website link.");
     if (!/^https?:\/\//i.test(target)) target = "https://" + target;
+    let parsed: URL;
     try {
-      new URL(target);
+      parsed = new URL(target);
     } catch {
       return setError("That doesn't look like a valid URL.");
+    }
+    const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
+    if (host !== "xcessly.com") {
+      return setError("Note: only xcessly.com is allowed.");
     }
 
     setLoading(true);
@@ -131,6 +136,14 @@ function Home() {
     }
   }
 
+  function handleReset() {
+    setUrlInput("");
+    setResult("");
+    setError("");
+    setCopied(false);
+  }
+
+
   async function handleCopy() {
     if (!result) return;
     await navigator.clipboard.writeText(result);
@@ -140,7 +153,7 @@ function Home() {
 
   return (
     <SiteLayout>
-      <section className="relative overflow-hidden pt-12 pb-16 sm:pt-20 sm:pb-24">
+      <section className="relative overflow-hidden pt-4 pb-16 sm:pt-20 sm:pb-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <span className="hidden sm:inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1 text-xs font-medium text-muted-foreground">
@@ -169,10 +182,23 @@ function Home() {
                 <input
                   type="text"
                   value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
-                  placeholder="Paste your website link here"
-                  className="w-full rounded-lg border border-input bg-background py-3 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  onChange={(e) => {
+                    setUrlInput(e.target.value);
+                    if (!e.target.value) setResult("");
+                  }}
+                  placeholder="https://xcessly.com/SO6565"
+                  className={`w-full rounded-lg border border-input bg-background py-3 pl-10 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 ${result ? "pr-10" : "pr-3"}`}
                 />
+                {result && (
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    aria-label="Reset"
+                    className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                  </button>
+                )}
               </div>
               <button
                 type="submit"
