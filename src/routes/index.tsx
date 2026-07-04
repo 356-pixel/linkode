@@ -153,7 +153,7 @@ function Home() {
 
   return (
     <SiteLayout>
-      <section className="relative overflow-hidden pt-12 pb-16 sm:pt-20 sm:pb-24">
+      <section className="relative overflow-hidden pt-4 pb-16 sm:pt-20 sm:pb-24">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <span className="hidden sm:inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1 text-xs font-medium text-muted-foreground">
