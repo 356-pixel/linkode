@@ -113,10 +113,12 @@ function Home() {
     } catch {
       return setError("That doesn't look like a valid URL.");
     }
-    const host = parsed.hostname.replace(/^www\./i, "").toLowerCase();
-    if (host !== "xcessly.com") {
-      return setError("Only xcessly.com/ links are allowed");
+    // Accept any valid URL for now.
+    const host = parsed.hostname;
+    if (!host) {
+      return setError("That doesn't look like a valid URL.");
     }
+
 
     setLoading(true);
     try {
